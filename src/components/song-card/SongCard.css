@@ -1,0 +1,14 @@
+.song-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.song-card {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+}
+
+.song-title {
+  font-weight: bold;
+}
