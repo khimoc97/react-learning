@@ -1,24 +1,39 @@
+import { Action } from "../enums/action.enum";
+
 export interface ISong {
-  id: string;
-  title: string;
-  description: string;
-  filePath: string;
-  likes: number;
-  owner: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  id: string,
+  title: string,
+  description: string,
+  filePath: string,
+  likes: number,
+  owner: string,
+  createdAt?: Date,
+  updatedAt?: Date
 }
+
+export interface IPlayingSong {
+  playingSong: ISong,
+  songUrl: string
+}
+
+export const playingSongDefaultValue = {
+  playingSong: {} as ISong,
+  songUrl: ''
+} as IPlayingSong
+
+export const songContextDefaultValue = {
+  songList: [],
+  songDispatch: () => { }
+} as SongContextType;
 
 export type SongContextType = {
   songList: ISong[];
-  dispatch: Dispatch;
+  songDispatch: SongDispatch;
 };
 
-export enum DispatchAction {
-  'Fetch',
-  'Add',
-  'Update',
-  'Delete'
+export interface ISongDispatchAction {
+  action: Action;
+  payload?: ISong[] | ISong;
 }
 
-type Dispatch = (action: string) => void;
+type SongDispatch = (action: ISongDispatchAction) => void;

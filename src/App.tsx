@@ -1,51 +1,34 @@
-import Amplify, { API, graphqlOperation } from "aws-amplify";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
+import Amplify, { } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import { AmplifySignOut, withAuthenticator } from "@aws-amplify/ui-react";
-import { listSongs } from "./graphql/queries";
-import { useEffect } from "react";
-import { ISong } from "./models/song";
 import "./App.css";
-import { SongCard } from "./components/song-card/SongCard";
+import { SongProivder } from "./contexts/SongContext";
+import { SongList } from "./components/song-list/SongList";
+import { Add } from "@material-ui/icons";
+import { IconButton } from "@material-ui/core";
 import { useState } from "react";
-import { SongProivder } from "./context/SongContext";
+import { AddSong } from "./components/add-song/AddSong";
 
 Amplify.configure(awsconfig);
 
 const App = () => {
-  const [songList, setSongList] = useState<ISong[]>([]);
-
-  useEffect(() => {
-    fetchSongs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchSongs = async () => {
-    try {
-      const response = (await API.graphql(
-        graphqlOperation(listSongs)
-      )) as GraphQLResult<{ listSongs: { items: ISong[] } }>;
-      const result = response.data?.listSongs.items
-        ? response.data?.listSongs.items
-        : [];
-
-      setSongList(result);
-      console.log(songList);
-    } catch (error) {}
-  };
+  const [isAdding, setIsAdding] = useState<boolean>(false);
 
   return (
     <div className="App">
       <header className="App-header">
         <AmplifySignOut />
-        <h2>My App Content</h2>
+        <h2>My Ai Tun</h2>
       </header>
-      <div className="songList">
-        {songList.map((song: ISong, idx: number) => (
-          <SongProivder  key={song.id}>
-            <SongCard song={song} idx={idx} />
-          </SongProivder>
-        ))}
+      <div className="song-list-wrapper">
+        <SongProivder>
+          <SongList />
+          {isAdding
+            ? <AddSong finishUpload={() => setIsAdding(false)} />
+            : <IconButton onClick={() => setIsAdding(true)}>
+              <Add />
+            </IconButton>}
+        </SongProivder>
       </div>
     </div>
   );

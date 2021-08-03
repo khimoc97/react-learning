@@ -1,16 +1,14 @@
 import { createContext, useContext, useReducer } from "react";
-import { SongContextType } from "../models/song";
+import { songContextDefaultValue, SongContextType } from "../models/Song";
 import { SongReducer } from "../reducer/SongReducer";
 
-const SongContext = createContext<SongContextType | undefined>(undefined);
+const SongContext = createContext<SongContextType>(songContextDefaultValue);
 
 function SongProivder(props: any): any {
-  const [songList, dispatch] = useReducer(SongReducer, {});
-
-  const value = { songList, dispatch };
+  const [songList, songDispatch] = useReducer(SongReducer, {});
 
   return (
-    <SongContext.Provider value={value}>{props.childern}</SongContext.Provider>
+    <SongContext.Provider value={{ songList, songDispatch }}>{props.children}</SongContext.Provider>
   );
 }
 

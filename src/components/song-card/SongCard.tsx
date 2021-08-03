@@ -1,21 +1,22 @@
-import { ISong } from "../../models/song";
+import { IPlayingSong, ISong, ISongDispatchAction } from "../../models/Song";
 import { IconButton, Paper } from "@material-ui/core";
 import PlayArrowIcon from "@material-ui/icons/PlayArrow";
 import FavoriteIcon from "@material-ui/icons/Favorite";
+import PauseIcon from "@material-ui/icons/Pause";
 import "./SongCard.css";
-import { API, graphqlOperation } from "aws-amplify";
-import { updateSong } from "../../graphql/mutations";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { useSongContext } from "../../context/SongContext";
-import { useEffect } from "react";
+import { UpdateSong } from "../../apis/SongApi";
+import { useSongContext } from "../../contexts/SongContext";
+import ReactPlayer from "react-player";
+import { Action } from "../../enums/action.enum";
 
-export const SongCard = (props: { song: ISong; idx: number }) => {
+interface SongCardProps {
+  song: ISong,
+  playingSong: IPlayingSong,
+  toggleSong: (song: ISong) => void
+}
+
+export const SongCard = (props: SongCardProps) => {
   const songContext = useSongContext();
-
-  useEffect(() => {
-    songContext.dispatch('fetch');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const addLike = async () => {
     try {
@@ -24,24 +25,24 @@ export const SongCard = (props: { song: ISong; idx: number }) => {
       delete updatedSong.createdAt;
       delete updatedSong.updatedAt;
 
-      const response = (await API.graphql(
-        graphqlOperation(updateSong, { input: updatedSong })
-      )) as GraphQLResult<{ updateSong: ISong }>;
+      const result = (await UpdateSong(updatedSong)).data?.updateSong;
 
-      console.log(response.data?.updateSong);
-      props.song = response.data?.updateSong
-        ? response.data?.updateSong
-        : ({} as ISong);
+      const dispatchAction = {
+        action: Action.update,
+        payload: result
+      } as ISongDispatchAction
+      songContext.songDispatch(dispatchAction);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <Paper variant="outlined" elevation={2} key={`song${props.idx}`}>
+    <Paper className="song-card-wrapper" variant="outlined" elevation={2}>
+      {console.log(props.song.id)}
       <div className="song-card">
-        <IconButton aria-label="play">
-          <PlayArrowIcon />
+        <IconButton aria-label="play" onClick={() => props.toggleSong(props.song)}>
+          {props.playingSong.playingSong.id === props.song.id ? <PauseIcon /> : <PlayArrowIcon />}
         </IconButton>
         <div>
           <div className="song-title">{props.song.title}</div>
@@ -55,6 +56,17 @@ export const SongCard = (props: { song: ISong; idx: number }) => {
         </div>
         <div className="song-description">{props.song.description}</div>
       </div>
+      {props.playingSong.playingSong.id === props.song.id ? (
+        <div className="audio-player">
+          <ReactPlayer
+            url={props.playingSong.songUrl}
+            controls
+            playing
+            height="50px"
+            onPause={() => props.toggleSong(props.song)}
+          />
+        </div>
+      ) : null}
     </Paper>
   );
-};
+}
