@@ -1,13 +1,12 @@
 import { Storage } from "aws-amplify";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { FetchSongList } from "../../apis/SongApi";
 import { useSongContext } from "../../contexts/SongContext";
 import { Action } from "../../enums/action.enum";
 import { IPlayingSong, ISong, ISongDispatchAction, playingSongDefaultValue } from "../../models/Song";
 import { SongCard } from "../song-card/SongCard";
 
-export function SongList() {
+export const SongList = memo(() => {
   const [playingSong, setPlayingSong] = useState<IPlayingSong>(playingSongDefaultValue);
   const songContext = useSongContext();
 
@@ -60,4 +59,4 @@ export function SongList() {
       })}
     </div>
   );
-}
+})

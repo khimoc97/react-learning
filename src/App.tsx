@@ -4,10 +4,11 @@ import { AmplifySignOut, withAuthenticator } from "@aws-amplify/ui-react";
 import "./App.css";
 import { SongProivder } from "./contexts/SongContext";
 import { SongList } from "./components/song-list/SongList";
-import { Add } from "@material-ui/icons";
+import { Add, Cancel } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
 import { useState } from "react";
 import { AddSong } from "./components/add-song/AddSong";
+import React from 'react';
 
 Amplify.configure(awsconfig);
 
@@ -24,7 +25,13 @@ const App = () => {
         <SongProivder>
           <SongList />
           {isAdding
-            ? <AddSong finishUpload={() => setIsAdding(false)} />
+            ?
+            <React.Fragment>
+              <AddSong finishUpload={() => setIsAdding(false)} />
+              <IconButton onClick={() => setIsAdding(false)}>
+                <Cancel />
+              </IconButton>
+            </React.Fragment>
             : <IconButton onClick={() => setIsAdding(true)}>
               <Add />
             </IconButton>}
